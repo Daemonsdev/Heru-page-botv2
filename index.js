@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const { sendMessage } = require('./handles/sendMessage');
+const { handleMessage } = require('./handles/handleMessage');  // Import handleMessage
 const helpCommand = require('./commands/help');
 
 const app = express();
@@ -37,19 +38,6 @@ function handlePostback(event, pageAccessToken) {
     helpCommand.execute(senderId, [], pageAccessToken, sendMessage);
   } else {
     sendMessage(senderId, { text: `You sent a postback with payload: ${payload}` }, pageAccessToken);
-  }
-}
-
-// Define the handleMessage function
-function handleMessage(event, pageAccessToken) {
-  const senderId = event.sender.id;
-  const message = event.message.text;
-
-  // Basic response or logic to process the message
-  if (message.toLowerCase() === 'help') {
-    helpCommand.execute(senderId, [], pageAccessToken, sendMessage);
-  } else {
-    sendMessage(senderId, { text: `You said: ${message}` }, pageAccessToken);
   }
 }
 
@@ -96,4 +84,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-      
+                                                                       
