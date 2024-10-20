@@ -11,10 +11,14 @@ module.exports = {
 
     const quickReplies = commandFiles.map(file => {
       const command = require(path.join(commandsDir, file));
+
+      // Check if command.name exists, otherwise provide a default value
+      const commandName = command.name ? command.name : 'Unknown Command';
+
       return {
         content_type: "text",
-        title: command.name,
-        payload: `COMMAND_${command.name.toUpperCase()}`
+        title: commandName,
+        payload: `COMMAND_${commandName.toUpperCase()}`
       };
     });
 
