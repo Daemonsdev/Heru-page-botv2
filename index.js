@@ -40,6 +40,19 @@ function handlePostback(event, pageAccessToken) {
   }
 }
 
+// Define the handleMessage function
+function handleMessage(event, pageAccessToken) {
+  const senderId = event.sender.id;
+  const message = event.message.text;
+
+  // Basic response or logic to process the message
+  if (message.toLowerCase() === 'help') {
+    helpCommand.execute(senderId, [], pageAccessToken, sendMessage);
+  } else {
+    sendMessage(senderId, { text: `You said: ${message}` }, pageAccessToken);
+  }
+}
+
 const VERIFY_TOKEN = 'pagebot';
 const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8');
 
@@ -65,9 +78,9 @@ app.post('/webhook', (req, res) => {
     body.entry.forEach(entry => {
       entry.messaging.forEach(event => {
         if (event.message) {
-          handleMessage(event, PAGE_ACCESS_TOKEN);  // Ensure handleMessage is implemented
+          handleMessage(event, PAGE_ACCESS_TOKEN);  // Call handleMessage for incoming messages
         } else if (event.postback) {
-          handlePostback(event, PAGE_ACCESS_TOKEN);
+          handlePostback(event, PAGE_ACCESS_TOKEN); // Call handlePostback for postbacks
         }
       });
     });
@@ -83,3 +96,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+      
