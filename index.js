@@ -1,46 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const axios = require('axios');
-const path = require('path');
 const { sendMessage } = require('./handles/sendMessage');
 const helpCommand = require('./commands/help');
 
 const app = express();
 app.use(bodyParser.json());
-
-const loadMenuCommands = async () => {
-  try {
-    const commandsDir = path.join(__dirname, 'commands');
-    const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
-
-    const commandsList = commandFiles.map(file => {
-      const command = require(path.join(commandsDir, file));
-      return { name: command.name, description: command.description || 'No description available' };
-    });
-
-    const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
-      commands: [
-        {
-          locale: "default",
-          commands: commandsList
-        }
-      ]
-    }, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (loadCmd.data.result === "success") {
-      console.log("Commands loaded!");
-    } else {
-      console.log("Failed to load commands");
-    }
-  } catch (error) {
-    console.error('Error loading commands:', error);
-  }
-};
 
 async function sendQuickReplies(senderId, pageAccessToken) {
   const quickReplies = [
@@ -100,7 +65,7 @@ app.post('/webhook', (req, res) => {
     body.entry.forEach(entry => {
       entry.messaging.forEach(event => {
         if (event.message) {
-          handleMessage(event, PAGE_ACCESS_TOKEN);
+          handleMessage(event, PAGE_ACCESS_TOKEN);  // Ensure handleMessage is implemented
         } else if (event.postback) {
           handlePostback(event, PAGE_ACCESS_TOKEN);
         }
@@ -113,9 +78,8 @@ app.post('/webhook', (req, res) => {
   }
 });
 
-loadMenuCommands();
-
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
